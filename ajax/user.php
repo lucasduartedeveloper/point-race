@@ -47,9 +47,10 @@ try {
              $stmt = $pdo->prepare($sql);
              $stmt->execute();
 
-             $arr = 
-             array('id' => 1, 'name' => $name, 
-             'meters' => 0);
+             $arr = [
+                 array('id' => 1, 'name' => $name, 
+             'meters' => 0)
+             ];
 
              echo json_encode($arr);
         }
