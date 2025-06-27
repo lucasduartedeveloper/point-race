@@ -1,0 +1,29 @@
+/* Optional: Makes the sample page fill the window. */
+html, body, #app {
+    --font-family: "Arial", serif;
+    --font-family: "Nunito", sans-serif;
+    --font-family: 'Roboto Slab', serif;
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    color: #000;
+    background-position: center;
+    background-size: cover;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+     user-select: none;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     flex-direction: column;
+     text-align: center;
+     overflow-y: hidden;
+     //transform: rotateY(180deg);
+}

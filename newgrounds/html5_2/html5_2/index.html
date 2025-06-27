@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title></title>
+<link rel="stylesheet" href="game.css">
+</head>
+<body>
+TEXTO
+<script>
+<script src="//cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+    var sw = window.innerWidth;
+    var sh = window.innerHeight;
+
+    var scale = window.innerWidth/360;
+
+    var iframe = document.createElement("iframe");
+    iframe.id = "app";
+    iframe.style.position = "fixed";
+    iframe.style.left = ((window.innerWidth/2)-(180))+"px";
+    iframe.style.top = ((window.innerHeight/2)-(334.5))+"px";
+    iframe.style.width = (360)+"px";
+    iframe.style.height = (669)+"px";
+    iframe.style.border = "2px solid #ccc";
+    iframe.src = ("https://point-race.kesug.com");
+    iframe.style.transform = "scale("+scale+")";
+    document.body.appendChild(iframe);
+
+    var loadingView = document.createElement("span");
+    loadingView.style.position = "absolute";
+    loadingView.innerText = "LOADING";
+    loadingView.style.color = "#fff";
+    loadingView.style.textAlign = "center";
+    loadingView.style.left = ((sw/2)-50)+"px";
+    loadingView.style.top = ((sh/2)-25)+"px";
+    loadingView.style.width = (100)+"px";
+    loadingView.style.height = (50)+"px";
+    document.body.appendChild(loadingView);
+
+    iframe.onload = function() {
+        loadingView.style.display = "none";
+    };
+</script>
+</script>
+</body>
+</html> 
