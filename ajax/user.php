@@ -1,4 +1,4 @@
-<?php include ("config/db_local.php")?>
+<?php include ("config/db_fsh.php")?>
 <?php
 //header("Content-Type: application/json; charset=utf-8");
 $sql ="";
