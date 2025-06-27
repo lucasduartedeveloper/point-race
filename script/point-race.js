@@ -109,7 +109,9 @@ $(document).ready(function() {
             user.meters = user.meters + 1;
             metersView.innerText = user.meters+" m";
 
-            updateUser();
+            updateUser(function() {
+                ws.send("PAPER|"+playerId+"|update");
+            });
         });
     };
 
@@ -135,7 +137,9 @@ $(document).ready(function() {
             user.meters = user.meters - 1;
             metersView.innerText = user.meters+" m";
 
-            updateUser();
+            updateUser(function() {
+                ws.send("PAPER|"+playerId+"|update");
+            });
         });
     };
 
@@ -220,6 +224,15 @@ var animate = function() {
 
     startTime = new Date().getTime();
 
+    ws.onmessage = function(e) {
+        var msg = e.data.split("|");
+        if (msg[0] == "PAPER" &&
+            msg[1] != playerId &&
+            msg[2] == "update") {
+            getUsers();
+        }
+    };
+
     window.requestAnimationFrame(animate);
 };
 
@@ -259,7 +272,7 @@ var getUser = function(name, callback) {
     });
 };
 
-var updateUser = function() {
+var updateUser = function(callback) {
     $.ajax({
         url: "ajax/user.php",
         method: "POST",
@@ -267,7 +280,7 @@ var updateUser = function() {
         data: { action: "update-user", user: user }
     })
     .done(function(data, status, xhr) {
-        
+        callback();
     });
 };
 
