@@ -145,6 +145,7 @@ $(document).ready(function() {
     nameView.placeholder = "input name";
     nameView.type = "text";
     nameView.value = "";
+    nameView.style.background = "#000";
     nameView.style.color = "#fff";
     nameView.style.textAlign= "center";
     nameView.style.left = ((sw/2)-150)+"px";
