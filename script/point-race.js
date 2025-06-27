@@ -232,7 +232,7 @@ var getUsers = function() {
         var json = JSON.parse(data);
         users = json;
 
-        if (user.id == 0) {
+        if (user.id == 0 && users.length > 0) {
             var meters = 0;
             for (var n = 0; n < users.length; n++) {
                 if (users[n].meters > meters)
