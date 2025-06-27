@@ -1,2 +1,1 @@
-# platformer
-# frequency-draw
+# point-race
