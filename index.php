@@ -80,7 +80,7 @@ echo "\n";
 </head>
 <body>
 
-<p id="title">BOT</p>
+<p id="title"></p>
 
 <p id="version-info" style="display:none">
      v25.0.37
