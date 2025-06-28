@@ -1,27 +1,24 @@
 <?php
 
-$uri = "mysql://avnadmin:AVNS_YG15ZpWmBU9m9AAZgju@mysql-3bcb1c69-lucasduarteoliveira1992-d4ed.d.aivencloud.com:13438/defaultdb?ssl-mode=REQUIRED";
+// new db
+$host = "mysql-3bcb1c69-lucasduarteoliveira1992-d4ed.d.aivencloud.com";
+$user = "avnadmin";
+$password = "AVNS_YG15ZpWmBU9m9AAZgju";
+$dbname = "defaultdb";
+$port = "13438";
 
-$fields = parse_url($uri);
+try{
 
-// build the DSN including SSL settings
-$conn = "mysql:";
-$conn .= "host=" . $fields["host"];
-$conn .= ";port=" . $fields["port"];
-$conn .= ";dbname=defaultdb";
-$conn .= ";sslmode=verify-ca;sslrootcert=ca.pem";
+    //Set DSN data source name
+    $dsn = "mysql:host=".$host.";port=".$port.";dbname=".$dbname.";sslmode=verify-ca;sslrootcert=ca.pem";
 
-try {
-  $db = new PDO($conn, $fields["user"], $fields["pass"]);
-
-  $stmt = $db->query("SELECT VERSION()");
-  print($stmt->fetch()[0]);
-} catch (Exception $e) {
-  echo "Error: " . $e->getMessage();
+    //create a pdo instance
+    $pdo = new PDO($dsn, $user, $password);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_OBJ);
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES,false);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 }
-
-// Show all information, defaults to INFO_ALL
-phpinfo();
-
-?>
-
+catch (PDOException $e) {
+   echo "Connection failed: " . $e->getMessage();
+}
+  ?>
