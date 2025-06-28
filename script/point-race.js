@@ -95,8 +95,8 @@ $(document).ready(function() {
     rightView.innerText = ">";
     rightView.style.color = "#000";
     rightView.style.left = ((sw/2)+25)+"px";
-    rightView.style.top = (sh-30)+"px";
-    rightView.style.width = (40)+"px";
+    rightView.style.top = (sh-70)+"px";
+    rightView.style.width = (50)+"px";
     rightView.style.height = (30)+"px";
     rightView.style.zIndex = "15";
     document.body.appendChild(rightView);
@@ -120,9 +120,9 @@ $(document).ready(function() {
     leftView.style.position = "absolute";
     leftView.innerText = "<";
     leftView.style.color = "#000";
-    leftView.style.left = ((sw/2)-55)+"px";
-    leftView.style.top = (sh-30)+"px";
-    leftView.style.width = (40)+"px";
+    leftView.style.left = ((sw/2)-75)+"px";
+    leftView.style.top = (sh-70)+"px";
+    leftView.style.width = (50)+"px";
     leftView.style.height = (30)+"px";
     leftView.style.zIndex = "15";
     document.body.appendChild(leftView);
