@@ -141,7 +141,18 @@ echo "\n";
 <!-- PHP -->
 
 <script src="//cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
+<script>
+var queryString = window.location.search;
+var urlParams = new URLSearchParams(queryString);
+
+var showEruda = true;
+
+if (urlParams.has("eruda"))
+showEruda = urlParams.get("eruda") == "true";
+
+if (showEruda)
+eruda.init();
+</script>
 
 </body>
 </html> 
