@@ -161,6 +161,15 @@ $(document).ready(function() {
 
     getUsers();
 
+    ws.onmessage = function(e) {
+        var msg = e.data.split("|");
+        if (msg[0] == "PAPER" &&
+            msg[1] != playerId &&
+            msg[2] == "update") {
+            getUsers();
+        }
+    };
+
     window.requestAnimationFrame(animate);
 });
 
@@ -223,15 +232,6 @@ var animate = function() {
     };
 
     startTime = new Date().getTime();
-
-    ws.onmessage = function(e) {
-        var msg = e.data.split("|");
-        if (msg[0] == "PAPER" &&
-            msg[1] != playerId &&
-            msg[2] == "update") {
-            getUsers();
-        }
-    };
 
     window.requestAnimationFrame(animate);
 };
