@@ -449,13 +449,9 @@ var animate = function() {
         if (analogX == 0 && analogY == 0)
         break database;
 
-        var x = user.x;
-        var y = user.y;
-        var angle = user.angle;
-
         databaseReady = false;
-        getUser(name, function() {
-            if (!userUpdated) {
+        if (!userUpdated) {
+            getUser(name, function() {
                 /*
                 user.x = user.x + analogX;
                 user.y = user.y + analogY;
@@ -463,18 +459,17 @@ var animate = function() {
 
                 userUpdated = true;
                 getUsers();
-            }
-            else {
-                user.x = x;
-                user.y = y;
-                user.angle = angle;
-            }
 
-            updateUser(function() {
-                ws.send("PAPER|"+playerId+"|update");
                 databaseReady = true;
             });
-        });
+        }
+        else {
+            updateUser(function() {
+                ws.send("PAPER|"+
+                playerId+"|update");
+                databaseReady = true;
+            });
+        }
     }
     }
 
