@@ -150,8 +150,8 @@ $(document).ready(function() {
 
         if ((diffX > 0 && v.x < 0) || 
         (diffX < 0 && v.x > 0)) {
-            deg = -deg;
-            v = _rotate2d(c, p, deg);
+            var degFix = -deg;
+            v = _rotate2d(c, p, degFix);
         }
 
         analogAngle = deg;
@@ -193,8 +193,8 @@ $(document).ready(function() {
 
         if ((diffX > 0 && v.x < 0) || 
         (diffX < 0 && v.x > 0)) {
-            deg = -deg;
-            v = _rotate2d(c, p, deg);
+            var degFix = -deg;
+            v = _rotate2d(c, p, degFix);
         }
 
         analogX = parseFloat(v.x.toFixed(2));
