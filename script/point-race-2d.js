@@ -148,6 +148,12 @@ $(document).ready(function() {
         var deg = (180/Math.PI) * a;
         var v = _rotate2d(c, p, deg);
 
+        if ((diffX > 0 && v.x < 0) || 
+        (diffX < 0 && v.x > 0)) {
+            deg = -deg;
+            v = _rotate2d(c, p, deg);
+        }
+
         analogAngle = deg;
         analogX = v.x;
         analogY = v.y;
@@ -184,6 +190,12 @@ $(document).ready(function() {
 
         var deg = (180/Math.PI) * a;
         var v = _rotate2d(c, p, deg);
+
+        if ((diffX > 0 && v.x < 0) || 
+        (diffX < 0 && v.x > 0)) {
+            deg = -deg;
+            v = _rotate2d(c, p, deg);
+        }
 
         analogX = parseFloat(v.x.toFixed(2));
         analogY = parseFloat(v.y.toFixed(2));
@@ -444,9 +456,10 @@ var animate = function() {
         databaseReady = false;
         getUser(name, function() {
             if (!userUpdated) {
+                /*
                 user.x = user.x + analogX;
                 user.y = user.y + analogY;
-                user.angle = analogAngle;
+                user.angle = analogAngle;*/
 
                 userUpdated = true;
                 getUsers();
