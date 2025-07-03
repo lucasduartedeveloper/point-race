@@ -1,0 +1,518 @@
+var uploadAlert = new Audio("audio/ui-audio/upload-alert.wav");
+var warningBeep = new Audio("audio/beep.wav");
+
+var sw = 360; //window.innerWidth;
+var sh = 669; //window.innerHeight;
+
+var gridSize = 10;
+
+if (window.innerWidth > window.innerHeight) {
+    sw = window.innerWidth;
+    sh = window.innerHeight;
+    gridSize = 20;
+}
+
+var queryString = window.location.search;
+var urlParams = new URLSearchParams(queryString);
+if (urlParams.has("height"))
+sh = parseInt(urlParams.get("height"));
+
+var audioBot = true;
+var playerId = new Date().getTime();
+
+var canvasBackgroundColor = "rgba(255,255,255,1)";
+var backgroundColor = "rgba(50,50,65,1)";
+var buttonColor = "rgba(75,75,90,1)";
+
+var audioStream = 
+new Audio("audio/music/stream-0.wav");
+
+// Botão de gravação
+$(document).ready(function() {
+    $("html, body").css("overscroll-behavior", "none");
+    $("html, body").css("overflow", "hidden");
+    $("html, body").css("background", "#000");
+
+    $("#title").css("font-size", "15px");
+    $("#title").css("color", "#fff");
+    $("#title").css("top", "10px");
+    $("#title").css("z-index", "25");
+
+    // O outro nome não era [  ]
+    // Teleprompter
+    $("#title")[0].innerText = ""; //"PICTURE DATABASE"; 
+    $("#title")[0].onclick = function() {
+        var text = prompt();
+        sendText(text);
+    };
+
+    tileSize = (sw/7);
+
+    document.body.style.overflowX = "scroll";
+
+    var rnd = Math.floor(Math.random()*360);
+
+    canvasView = 
+    document.createElement("canvas");
+    canvasView.style.position = "absolute";
+    canvasView.style.left = (0)+"px";
+    canvasView.style.top = (0)+"px";
+    canvasView.width = (sw);
+    canvasView.height = (sh);
+    canvasView.style.width = (sw)+"px";
+    canvasView.style.height = (sh)+"px";
+    canvasView.style.zIndex = "15";
+    document.body.appendChild(canvasView);
+
+    fpsView = 
+    document.createElement("span");
+    fpsView.style.position = "absolute";
+    fpsView.innerText = "30";
+    fpsView.style.color = "#fff";
+    fpsView.style.left = (10)+"px";
+    fpsView.style.top = (10)+"px";
+    fpsView.style.width = (50)+"px";
+    fpsView.style.height = (20)+"px";
+    fpsView.style.zIndex = "15";
+    //document.body.appendChild(fpsView);
+
+    metersView = 
+    document.createElement("span");
+    metersView.style.position = "absolute";
+    metersView.innerText = "0 m";
+    metersView.style.color = "#fff";
+    metersView.style.textAlign= "center";
+    metersView.style.left = ((sw/2)-50)+"px";
+    metersView.style.top = (50)+"px";
+    metersView.style.width = (100)+"px";
+    metersView.style.height = (20)+"px";
+    metersView.style.zIndex = "15";
+    document.body.appendChild(metersView);
+
+    nameView = 
+    document.createElement("input");
+    nameView.style.position = "absolute";
+    nameView.placeholder = "input name";
+    nameView.type = "text";
+    nameView.value = "";
+    nameView.style.background = "#000";
+    nameView.style.color = "#fff";
+    nameView.style.textAlign= "center";
+    nameView.style.left = ((sw/2)-150)+"px";
+    nameView.style.top = (100)+"px";
+    nameView.style.width = (100)+"px";
+    nameView.style.height = (20)+"px";
+    nameView.style.zIndex = "15";
+    document.body.appendChild(nameView);
+
+    getUsers();
+
+    analogAngle = 0;
+    analogX = 0;
+    analogY = 0;
+    analogStart = false;
+
+    var ontouchstart = function(e) {
+        var clientX = 0;
+        var clientY = 0;
+
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+        else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+
+        if (clientX > ((sw/2)-50) && 
+        clientX < ((sw/2)+50) && 
+        clientY > (sh-150) && 
+        clientY < (sh-50))
+        analogStart = true;
+
+        var diffX = clientX - (sw/2);
+        var diffY = clientY - (sh-100);
+
+        var a = _angle2d(diffX, diffY);
+        var hyp = 
+        Math.sqrt(
+        Math.pow(Math.abs(diffX),2)+
+        Math.pow(Math.abs(diffY),2));
+
+        var hn = hyp > 40 ? 1 : (1/40)*hyp;
+
+        var c = { x: 0, y: 0 };
+        var p = { x: 0, y: -hn };
+
+        var deg = (180/Math.PI) * a;
+        var v = _rotate2d(c, p, deg);
+
+        analogAngle = deg;
+        analogX = v.x;
+        analogY = v.y;
+    };
+
+    var ontouchmove = function(e) {
+        if (!analogStart) return;
+
+        var clientX = 0;
+        var clientY = 0;
+
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+        else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+
+        var diffX = clientX - (sw/2);
+        var diffY = clientY - (sh-100);
+
+        var a = _angle2d(diffX, diffY);
+        var hyp = 
+        Math.sqrt(
+        Math.pow(Math.abs(diffX),2)+
+        Math.pow(Math.abs(diffY),2));
+
+        var hn = hyp > 40 ? 1 : (1/40)*hyp;
+
+        var c = { x: 0, y: 0 };
+        var p = { x: 0, y: -hn };
+
+        var deg = (180/Math.PI) * a;
+        var v = _rotate2d(c, p, deg);
+
+        analogX = parseFloat(v.x.toFixed(2));
+        analogY = parseFloat(v.y.toFixed(2));
+        analogAngle = deg;
+    };
+
+    var ontouchend = function(e) {
+        analogX = 0;
+        analogY = 0;
+        analogStart = false;
+    };
+
+    canvasView.ontouchstart = ontouchstart;
+    canvasView.ontouchmove = ontouchmove;
+    canvasView.ontouchend = ontouchend;
+
+    canvasView.onmousedown = ontouchstart;
+    canvasView.onmousemove = ontouchmove;
+    canvasView.onmouseup = ontouchend;
+
+    ws.onmessage = function(e) {
+        var msg = e.data.split("|");
+        if (msg[0] == "PAPER" &&
+            msg[1] != playerId &&
+            msg[2] == "update") {
+            getUsers();
+        }
+    };
+
+    loadImages();
+
+    window.requestAnimationFrame(animate);
+});
+
+var imagesLoaded = false;
+
+var imgList = [
+    { path: "img/rocket.png", elem: 0 },
+    { path: "img/earth.png", elem: 0 },
+    { path: "img/mercury.png", elem: 0 }
+];
+
+var loadImages = function() {
+    var count = 0;
+
+    for (var n = 0; n < imgList.length; n++) {
+        var img = new Image();
+        img.n = n;
+        img.onload = function(e) {
+            count = count + 1;
+            imgList[this.n].elem = this;
+
+            if (count == imgList.length) {
+                imagesLoaded = true;
+                console.log("loaded "+
+                imgList[this.n].path);
+            }
+        }.bind(img);
+        img.src = imgList[n].path;
+    }
+};
+
+var databaseReady = true;
+
+var startTime = new Date().getTime();
+var frameCount = 0;
+var fps = 0;
+
+var objects = [
+    { name: "Earth", x: -100, y: 0, 
+    width: 64, height: 64, imgNo: 1 },
+    { name: "Mercury", x: 550, y: 0, 
+    width: 60, height: 60, imgNo: 2 }
+];
+
+var users = [ ];
+
+var user = { id: 0, name: "", x: 0, y: 0, angle: 0 };
+
+var animate = function() {
+    var currentTime = new Date().getTime();
+    var elapsedTime = currentTime-startTime;
+
+    fps = (1000/elapsedTime);
+    fpsView.innerText = fps.toFixed(2);
+
+    var canvas = canvasView;
+    var ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, sw, sh);
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.strokeStyle = "#555";
+    ctx.fillStyle = "#555";
+
+    ctx.save();
+    ctx.translate(-user.x, -user.y);
+
+    ctx.beginPath();
+    ctx.arc((sw/2), (sh/2), 1, 0, (Math.PI * 2));
+    ctx.fill();
+
+    var meters = Math.sqrt(
+    Math.pow(Math.abs(user.x),2)+
+    Math.pow(Math.abs(user.y),2));
+
+    metersView.innerText = 
+    meters.toFixed(2)+" m";
+
+    for (var n = 0; n < objects.length; n++) {
+        if (imagesLoaded)
+        ctx.drawImage(
+        imgList[objects[n].imgNo].elem, 
+        (sw/2)+objects[n].x-(objects[n].width/2), 
+        (sh/2)+objects[n].y-(objects[n].height/2), 
+        objects[n].width, objects[n]. height);
+
+        ctx.fillText(objects[n].name, 
+        ((sw/2)+objects[n].x), 
+        ((sh/2)+objects[n].y)+
+        (objects[n].size/2)+25);
+    }
+
+    for (var n = 0; n < users.length; n++) {
+        if (users[n].name == user.name)
+        continue;
+
+        ctx.beginPath();
+        //ctx.arc(((sw/2)+users[n].x), 
+        //((sh/2)+users[n].y), 5, 0, (Math.PI * 2));
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(((sw/2)+users[n].x), 
+        ((sh/2)+users[n].y));
+
+        ctx.rotate(users[n].angle * (Math.PI/180));
+
+        if (imagesLoaded)
+        ctx.drawImage(imgList[0].elem, 
+        -16, -16, 32, 32);
+
+        ctx.restore();
+
+        ctx.fillText(users[n].name, 
+        ((sw/2)+users[n].x), ((sh/2)+users[n].y)-25);
+
+        var hyp = Math.sqrt(
+        Math.pow(Math.abs(users[n].x),2)+
+        Math.pow(Math.abs(users[n].y),2));
+
+        ctx.fillText(hyp.toFixed(2)+ " m", 
+        ((sw/2)+users[n].x), 
+        ((sh/2)+users[n].y)+25);
+    };
+
+    ctx.restore();
+
+    ctx.fillStyle = "#fff";
+
+    if (user.id != 0) {
+        ctx.beginPath();
+        //ctx.arc((sw/2), (sh/2), 5, 0, (Math.PI * 2));
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate((sw/2), (sh/2));
+        ctx.rotate(user.angle * (Math.PI/180));
+
+        if (imagesLoaded)
+        ctx.drawImage(imgList[0].elem, 
+        -16, -16, 32, 32);
+
+        ctx.restore();
+
+        ctx.fillText(user.name, (sw/2), (sh/2)-25);
+    }
+
+    startTime = new Date().getTime();
+
+    ctx.strokeStyle = "#fff";
+    ctx.fillStyle = "#fff";
+
+    ctx.beginPath();
+    ctx.arc((sw/2), (sh-100), 50, 0, (Math.PI * 2));
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc((sw/2)+(analogX*40), 
+    (sh-100)+(analogY*40), 10, 0, (Math.PI * 2));
+    ctx.fill();
+
+    database: {
+    if (databaseReady) {
+        var name = nameView.value;
+        if (name == "") 
+        break database;
+
+        if (analogX == 0 && analogY == 0)
+        break database;
+
+        databaseReady = false;
+        getUser(name, function() {
+            user.x = user.x + analogX;
+            user.y = user.y + analogY;
+            user.angle = analogAngle;
+
+            updateUser(function() {
+                ws.send("PAPER|"+playerId+"|update");
+                databaseReady = true;
+            });
+        });
+    }
+    }
+
+    window.requestAnimationFrame(animate);
+};
+
+var getUsers = function() {
+    $.ajax({
+        url: "ajax/user_2d.php",
+        method: "GET",
+        datatype: "json"
+    })
+    .done(function(data, status, xhr) {
+        var json = JSON.parse(data);
+        users = json;
+
+        if (user.id == 0 && users.length > 0) {
+            var x = 0;
+            var y = 0;
+            var meters = 0;
+
+            for (var n = 0; n < users.length; n++) {
+                var hyp = Math.sqrt(
+                Math.pow(Math.abs(users[n].x),2)+
+                Math.pow(Math.abs(users[n].y),2));
+
+                if (hyp > meters) {
+                    x = users[n].x;
+                    y = users[n].y;
+                    meters = hyp;
+                }
+            }
+
+            user.x = x;
+            user.y = y;
+            user.angle = analogAngle;
+        }
+    });
+};
+
+var getUser = function(name, callback) {
+    $.ajax({
+        url: "ajax/user_2d.php?name="+name,
+        method: "GET",
+        datatype: "json"
+    })
+    .done(function(data, status, xhr) {
+        var json = JSON.parse(data);
+        user = json[0];
+
+        callback();
+    });
+};
+
+var updateUser = function(callback) {
+    $.ajax({
+        url: "ajax/user_2d.php",
+        method: "POST",
+        datatype: "json",
+        data: { action: "update-user", user: user }
+    })
+    .done(function(data, status, xhr) {
+        callback();
+    });
+};
+
+var createOscillator = function() {
+    // create web audio api context
+    var audioCtx = 
+    new(window.AudioContext || window. webkitAudioContext)();
+
+    // create Oscillator node
+    var oscillator = audioCtx.createOscillator();
+
+    var volume = audioCtx.createGain();
+    volume.gain.value = 1;
+
+    var biquadFilter = audioCtx.createBiquadFilter();
+    biquadFilter.type = "lowpass";
+    biquadFilter.frequency.value = 100;
+
+    // Create a stereo panner
+    var panNode = audioCtx.createStereoPanner();
+    panNode.connect(biquadFilter);
+
+    volume.connect(panNode);
+
+    oscillator.type = "square"; //"sine";
+    oscillator.frequency.value = 0; // value in hertz
+    oscillator.connect(audioCtx.destination);
+    oscillator.volume = volume;
+    oscillator.biquadFilter = biquadFilter;
+    oscillator.panNode = panNode;
+
+    return oscillator;
+};
+
+// 100 0-0.99 0.95 
+
+var visibilityChange;
+if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+  visibilityChange = "visibilitychange";
+} else if (typeof document.msHidden !== "undefined") {
+  visibilityChange = "msvisibilitychange";
+} else if (typeof document.webkitHidden !== "undefined") {
+  visibilityChange = "webkitvisibilitychange";
+}
+//^different browsers^
+
+var backgroundMode = false;
+document.addEventListener(visibilityChange, function(){
+    backgroundMode = !backgroundMode;
+    if (backgroundMode) {
+        console.log("backgroundMode: "+backgroundMode);
+    }
+    else {
+        console.log("backgroundMode: "+backgroundMode);
+    }
+}, false);
