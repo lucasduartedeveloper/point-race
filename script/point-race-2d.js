@@ -229,6 +229,15 @@ $(document).ready(function() {
 
     var c = { x: 1550, y: 0 };
     for (var n = 0; n < objects.length; n++) {
+       var angle = objects[n].angle;
+
+       var c = { x: 0, y: 0 };
+       var p = { x: 0, y: -1 };
+       var v = _rotate2d(c, p, 45);
+
+       if (v.x < 0)
+       angle = -angle;
+
        var p = { x: objects[n].x, y: objects[n].y };
        var pos = _rotate2d(c, p, objects[n].angle);
 
