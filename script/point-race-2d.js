@@ -215,6 +215,15 @@ $(document).ready(function() {
 
     loadImages();
 
+    var c = { x: 1550, y: 0 };
+    for (var n = 0; n < objects.length; n++) {
+       var p = { x: objects[n].x, y: objects[n].y };
+       var pos = _rotate2d(c, p, objects[n].angle);
+
+       objects[n].x = pos.x;
+       objects[n].y = pos.y;
+    }
+
     window.requestAnimationFrame(animate);
 });
 
@@ -223,7 +232,15 @@ var imagesLoaded = false;
 var imgList = [
     { path: "img/rocket.png", elem: 0 },
     { path: "img/earth.png", elem: 0 },
-    { path: "img/mercury.png", elem: 0 }
+    { path: "img/mercury.png", elem: 0 },
+    { path: "img/venus.png", elem: 0 },
+    { path: "img/mars.png", elem: 0 },
+    { path: "img/jupiter.png", elem: 0 },
+    { path: "img/saturn.png", elem: 0 },
+    { path: "img/uranus.png", elem: 0 },
+    { path: "img/neptune.png", elem: 0 },
+    { path: "img/pluto.png", elem: 0 },
+    { path: "img/sun.png", elem: 0 }
 ];
 
 var loadImages = function() {
@@ -236,10 +253,11 @@ var loadImages = function() {
             count = count + 1;
             imgList[this.n].elem = this;
 
+            console.log("loaded "+
+            imgList[this.n].path);
+
             if (count == imgList.length) {
                 imagesLoaded = true;
-                console.log("loaded "+
-                imgList[this.n].path);
             }
         }.bind(img);
         img.src = imgList[n].path;
@@ -254,9 +272,25 @@ var fps = 0;
 
 var objects = [
     { name: "Earth", x: -100, y: 0, 
-    width: 64, height: 64, imgNo: 1 },
+    width: 64, height: 64, angle: 0, imgNo: 1 },
     { name: "Mercury", x: 550, y: 0, 
-    width: 60, height: 60, imgNo: 2 }
+    width: 60, height: 60, angle: 225, imgNo: 2 },
+    { name: "Venus", x: 300, y: 0, 
+    width: 64, height: 64, angle: 100, imgNo: 3 },
+    { name: "Mars", x: -350, y: 0, 
+    width: 70, height: 70, angle: 265, imgNo: 4 },
+    { name: "Jupiter", x: -550, y: 0, 
+    width: 64, height: 64, angle: 350, imgNo: 5 },
+    { name: "Saturn", x: -850, y: 0, 
+    width: 130, height: 70, angle: 95, imgNo: 6 },
+    { name: "Uranus", x: -1100, y: 0, 
+    width: 90, height: 50, angle: 30, imgNo: 7 },
+    { name: "Neptune", x: -1300, y: 0, 
+    width: 50, height: 50, angle: 90, imgNo: 8 },
+    { name: "Pluto", x: -1550, y: 0, 
+    width: 50, height: 50, angle: 135, imgNo: 9 },
+    { name: "Sun", x: 800, y: 0, 
+    width: 70, height: 70, angle: 0, imgNo: 10 }
 ];
 
 var users = [ ];
@@ -285,7 +319,7 @@ var animate = function() {
 
     ctx.beginPath();
     ctx.arc((sw/2), (sh/2), 1, 0, (Math.PI * 2));
-    ctx.fill();
+    ctx.stroke();
 
     var meters = Math.sqrt(
     Math.pow(Math.abs(user.x),2)+
@@ -305,7 +339,15 @@ var animate = function() {
         ctx.fillText(objects[n].name, 
         ((sw/2)+objects[n].x), 
         ((sh/2)+objects[n].y)+
-        (objects[n].size/2)+25);
+        (objects[n].height/2)+25);
+
+        var co = 
+        Math.abs(objects[n].x-800);
+        var ca = 
+        Math.abs(objects[n].y);
+        var hyp = Math.sqrt(
+        Math.pow(co, 2), 
+        Math.pow(ca, 2));
     }
 
     for (var n = 0; n < users.length; n++) {
