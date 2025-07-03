@@ -293,6 +293,8 @@ var objects = [
     width: 70, height: 70, angle: 0, imgNo: 10 }
 ];
 
+var userUpdated = false;
+
 var users = [ ];
 
 var user = { id: 0, name: "", x: 0, y: 0, angle: 0 };
@@ -403,6 +405,10 @@ var animate = function() {
         ctx.restore();
 
         ctx.fillText(user.name, (sw/2), (sh/2)-25);
+
+        user.x = user.x + analogX;
+        user.y = user.y + analogY;
+        user.angle = analogAngle;
     }
 
     startTime = new Date().getTime();
@@ -421,6 +427,9 @@ var animate = function() {
 
     database: {
     if (databaseReady) {
+        if (user.name != nameView.value)
+        userUpdated = false;
+
         var name = nameView.value;
         if (name == "") 
         break database;
@@ -428,11 +437,25 @@ var animate = function() {
         if (analogX == 0 && analogY == 0)
         break database;
 
+        var x = user.x;
+        var y = user.y;
+        var angle = user.angle;
+
         databaseReady = false;
         getUser(name, function() {
-            user.x = user.x + analogX;
-            user.y = user.y + analogY;
-            user.angle = analogAngle;
+            if (!userUpdated) {
+                user.x = user.x + analogX;
+                user.y = user.y + analogY;
+                user.angle = analogAngle;
+
+                userUpdated = true;
+                getUsers();
+            }
+            else {
+                user.x = x;
+                user.y = y;
+                user.angle = angle;
+            }
 
             updateUser(function() {
                 ws.send("PAPER|"+playerId+"|update");
