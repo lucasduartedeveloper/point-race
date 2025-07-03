@@ -239,7 +239,7 @@ $(document).ready(function() {
        angle = -angle;
 
        var p = { x: objects[n].x, y: objects[n].y };
-       var pos = _rotate2d(c, p, objects[n].angle);
+       var pos = _rotate2d(c, p, angle);
 
        objects[n].x = pos.x;
        objects[n].y = pos.y;
