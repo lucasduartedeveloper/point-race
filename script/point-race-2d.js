@@ -89,6 +89,19 @@ $(document).ready(function() {
     metersView.style.zIndex = "15";
     document.body.appendChild(metersView);
 
+    coinsView = 
+    document.createElement("span");
+    coinsView.style.position = "absolute";
+    coinsView.innerText = "coins: 0";
+    coinsView.style.color = "#fff";
+    coinsView.style.textAlign= "right";
+    coinsView.style.left = (sw-110)+"px";
+    coinsView.style.top = (50)+"px";
+    coinsView.style.width = (100)+"px";
+    coinsView.style.height = (20)+"px";
+    coinsView.style.zIndex = "15";
+    document.body.appendChild(coinsView);
+
     nameView = 
     document.createElement("input");
     nameView.style.position = "absolute";
@@ -227,6 +240,8 @@ $(document).ready(function() {
 
     loadImages();
 
+    getCoins();
+
     var c = { x: 1550, y: 0 };
     for (var n = 0; n < objects.length; n++) {
        var angle = objects[n].angle;
@@ -248,6 +263,8 @@ $(document).ready(function() {
     window.requestAnimationFrame(animate);
 });
 
+var coins = [];
+
 var imagesLoaded = false;
 
 var imgList = [
@@ -261,7 +278,8 @@ var imgList = [
     { path: "img/uranus.png", elem: 0 },
     { path: "img/neptune.png", elem: 0 },
     { path: "img/pluto.png", elem: 0 },
-    { path: "img/sun.png", elem: 0 }
+    { path: "img/sun.png", elem: 0 },
+    { path: "img/coin.png", elem: 0 }
 ];
 
 var loadImages = function() {
@@ -318,7 +336,7 @@ var userUpdated = false;
 
 var users = [ ];
 
-var user = { id: 0, name: "", x: 0, y: 0, angle: 0 };
+var user = { id: 0, name: "", x: 0, y: 0, angle: 0, coins: 0 };
 
 var animate = function() {
     var currentTime = new Date().getTime();
@@ -351,6 +369,8 @@ var animate = function() {
     metersView.innerText = 
     meters.toFixed(2)+" m";
 
+    coinsView.innerText = "coins: "+user.coins;
+
     for (var n = 0; n < objects.length; n++) {
         if (imagesLoaded)
         ctx.drawImage(
@@ -371,6 +391,48 @@ var animate = function() {
         var hyp = Math.sqrt(
         Math.pow(co, 2), 
         Math.pow(ca, 2));
+    }
+
+    var removeCoins = [];
+
+    for (var n = 0; n < coins.length; n++) {
+        if (imagesLoaded)
+        ctx.drawImage(imgList[11].elem, 
+        (sw/2)+coins[n].x-16, 
+        (sh/2)+coins[n].y-16, 32, 32);
+
+        var diffX = coins[n].x-user.x;
+        var diffY = coins[n].y-user.y;
+
+        var co = Math.abs(diffX);
+        var ca = Math.abs(diffY);
+
+        var hyp = Math.sqrt(
+        Math.pow(co, 2) + 
+        Math.pow(ca, 2));
+
+        if (hyp < 100) {
+            //console.log(user, coins[n], hyp);
+            ctx.beginPath();
+            ctx.arc((sw/2)+coins[n].x, 
+            (sh/2)+coins[n].y, 
+            16, 0, (Math.PI * 2));
+            ctx.stroke();
+        }
+
+        if (hyp < 10)
+        removeCoins.push(n);
+    }
+
+    var updateCoins = false;
+    for (var n = 0; n < removeCoins.length; n++) {
+        user.coins = user.coins + 1;
+        var coin = 
+        coins.splice(removeCoins[n], 1)[0];
+        deleteCoin(coin, function() {
+            getCoins();
+        });
+        updateCoins = true;
     }
 
     for (var n = 0; n < users.length; n++) {
@@ -455,7 +517,8 @@ var animate = function() {
         if (name == "") 
         break database;
 
-        if (analogX == 0 && analogY == 0)
+        if (analogX == 0 && analogY == 0 && 
+        !updateCoins)
         break database;
 
         databaseReady = false;
@@ -495,6 +558,7 @@ var getUsers = function() {
         var json = JSON.parse(data);
         users = json;
 
+        /*
         if (user.id == 0 && users.length > 0) {
             var x = 0;
             var y = 0;
@@ -515,7 +579,7 @@ var getUsers = function() {
             user.x = x;
             user.y = y;
             user.angle = analogAngle;
-        }
+        }*/
     });
 };
 
@@ -529,6 +593,34 @@ var getUser = function(name, callback) {
         var json = JSON.parse(data);
         user = json[0];
 
+        callback();
+    });
+};
+
+var getCoins = function(name, callback) {
+    $.ajax({
+        url: "ajax/coin.php",
+        method: "GET",
+        datatype: "json"
+    })
+    .done(function(data, status, xhr) {
+        var json = JSON.parse(data);
+        coins = json;
+
+        if (callback)
+        callback();
+    });
+};
+
+var deleteCoin = function(coin, callback) {
+    $.ajax({
+        url: "ajax/coin.php",
+        method: "POST",
+        datatype: "json",
+        data: { action: "delete-coin", coin: coin }
+    })
+    .done(function(data, status, xhr) {
+        if (callback)
         callback();
     });
 };
