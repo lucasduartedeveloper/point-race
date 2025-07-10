@@ -1,4 +1,4 @@
-<?php include ("config/db_aiven.php")?>
+<?php include ("config/db_local.php")?>
 <?php
 //header("Content-Type: application/json; charset=utf-8");
 $sql ="";
@@ -17,10 +17,12 @@ try {
         $x = $user["x"];
         $y = $user["y"];
         $angle = $user["angle"];
+        $coins = $user["coins"];
 
         $sql = 
         "UPDATE users_2d SET x = "
         .$x.", y = ".$y.", angle = ".$angle.
+        ", coins = ".$coins.
         " WHERE name = '".$name."';";
 
         $stmt = $pdo->prepare($sql);
@@ -29,7 +31,7 @@ try {
     else if (!empty($_GET["name"])) {
         $name = htmlspecialchars($_GET["name"]);
 
-        $sql = "SELECT id, name, x, y, angle 
+        $sql = "SELECT id, name, x, y, angle, coins 
         FROM users_2d WHERE name='".$name."';";
 
         $stmt = $pdo->prepare($sql);
@@ -45,12 +47,14 @@ try {
                 name,
                 x,
                 y,
-                angle
+                angle,
+                coins
              ) VALUES ('".
                 $name."',".
                 $x.",".
                 $y.",".
-                $angle.
+                $angle.",".
+                $coins.
              ");";
 
              $stmt = $pdo->prepare($sql);
@@ -58,7 +62,7 @@ try {
 
              $arr = [
                  array('id' => 1, 'name' => $name, 
-             'meters' => 0)
+             'x' => 0, 'y' => 0, 'angle' => 0, 'coins' => 0)
              ];
 
              echo json_encode($arr);
@@ -71,7 +75,7 @@ try {
         //echo $sql;
     }
     else {
-        $sql = "SELECT id, name, x, y, angle 
+        $sql = "SELECT id, name, x, y, angle, coins 
         FROM users_2d;";
 
         $stmt = $pdo->prepare($sql);
