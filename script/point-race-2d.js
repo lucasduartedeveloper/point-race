@@ -48,9 +48,7 @@ $(document).ready(function() {
 
     tileSize = (sw/7);
 
-    document.body.style.overflowX = "scroll";
-
-    var rnd = Math.floor(Math.random()*360);
+    document.body.style.overflow = "hidden";
 
     canvasView = 
     document.createElement("canvas");
@@ -242,7 +240,6 @@ $(document).ready(function() {
 
     getCoins();
 
-    var c = { x: 1550, y: 0 };
     for (var n = 0; n < objects.length; n++) {
        var angle = objects[n].angle;
 
@@ -253,6 +250,7 @@ $(document).ready(function() {
        if (v.x < 0)
        angle = -angle;
 
+       var c = { x: 1550, y: 0 };
        var p = { x: objects[n].x, y: objects[n].y };
        var pos = _rotate2d(c, p, angle);
 
@@ -360,7 +358,7 @@ var animate = function() {
 
     ctx.beginPath();
     ctx.arc((sw/2), (sh/2), 1, 0, (Math.PI * 2));
-    ctx.stroke();
+    ctx.fill();
 
     var meters = Math.sqrt(
     Math.pow(Math.abs(user.x),2)+
