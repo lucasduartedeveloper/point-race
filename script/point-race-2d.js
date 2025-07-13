@@ -507,6 +507,19 @@ var animate = function() {
 
         ctx.fillText(user.name, (sw/2), (sh/2)-25);
 
+        var co = Math.abs(user.x);
+        var ca = Math.abs(user.y);
+
+        var hyp = Math.sqrt(
+        Math.pow(co, 2) + 
+        Math.pow(ca, 2));
+
+        var newX = user.x + analogX;
+        var newY = user.y + analogY;
+
+        if (hyp > 1500)
+        ctx.fillText("GO BACK", (sw/2), (sh/2)+25);
+
         user.x = user.x + analogX;
         user.y = user.y + analogY;
         user.angle = analogAngle;
