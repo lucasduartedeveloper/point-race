@@ -116,6 +116,21 @@ $(document).ready(function() {
     nameView.style.zIndex = "15";
     document.body.appendChild(nameView);
 
+    scoreView = 
+    document.createElement("div");
+    scoreView.style.position = "absolute";
+    scoreView.innerHTML = "";
+    scoreView.style.background = "#000";
+    scoreView.style.color = "#fff";
+    scoreView.style.textAlign = "left";
+    scoreView.style.left = (sw-110)+"px";
+    scoreView.style.top = (100)+"px";
+    scoreView.style.width = (100)+"px";
+    scoreView.style.height = (100)+"px";
+    //scoreView.style.border = "1px solid #fff";
+    scoreView.style.zIndex = "15";
+    document.body.appendChild(scoreView);
+
     getUsers();
 
     analogAngle = 0;
@@ -330,6 +345,7 @@ var objects = [
     width: 70, height: 70, angle: 0, imgNo: 10 }
 ];
 
+var updateCoins = false;
 var userUpdated = false;
 
 var users = [ ];
@@ -348,6 +364,7 @@ var animate = function() {
 
     ctx.clearRect(0, 0, sw, sh);
 
+    ctx.font = "10px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.strokeStyle = "#555";
@@ -422,7 +439,6 @@ var animate = function() {
         removeCoins.push(n);
     }
 
-    var updateCoins = false;
     for (var n = 0; n < removeCoins.length; n++) {
         user.coins = user.coins + 1;
         var coin = 
@@ -461,9 +477,13 @@ var animate = function() {
         Math.pow(Math.abs(users[n].x),2)+
         Math.pow(Math.abs(users[n].y),2));
 
-        ctx.fillText(hyp.toFixed(2)+ " m", 
+        ctx.fillText(hyp.toFixed(2)+" m", 
         ((sw/2)+users[n].x), 
         ((sh/2)+users[n].y)+25);
+
+        ctx.fillText(users[n].coins+" coins", 
+        ((sw/2)+users[n].x), 
+        ((sh/2)+users[n].y)+40);
     };
 
     ctx.restore();
@@ -538,6 +558,11 @@ var animate = function() {
                 ws.send("PAPER|"+
                 playerId+"|update");
                 databaseReady = true;
+
+                if (updateCoins)
+                getUsers();
+
+                updateCoins = false;
             });
         }
     }
@@ -555,6 +580,29 @@ var getUsers = function() {
     .done(function(data, status, xhr) {
         var json = JSON.parse(data);
         users = json;
+
+        var score = users.toSorted(function(a, b) {
+           if (a.coins > b.coins)
+           return -1;
+           if (a.coins < b.coins)
+           return 1;
+           if (a.coins == b.coins)
+           return 0;
+        });
+
+        var length = 3;
+
+        if (score.length < length)
+        length = score.length;
+
+        var text = "<b>TOP 3</b><br>";
+        for (var n = 0; n < length; n++) {
+            text = text + 
+            score[n].name+": "+score[n].coins + 
+            "<br>";
+        }
+
+        scoreView.innerHTML = text;
 
         /*
         if (user.id == 0 && users.length > 0) {
